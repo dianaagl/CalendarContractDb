@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">CalendarContractDb</string>
+    <string name="add_event">Добавить событие</string>
+    <string name="begin">Начало:</string>
+    <string name="place">Место</string>
+    <string name="date_format">%1$d.%2$d.%3$d.</string>
+    <string name="select_id_format">%1$s = %2$s</string>
+    <string name="add_event_but">Добавить событие</string>
+    <string name="delete_event_but">Удалить событие</string>
+    <string name="update_event">Обновить событие</string>
+    <string name="begin_date">Начало события</string>
+    <string name="title">Название</string>
+    <string name="end_evnt">Конец события</string>
+    <string name="description">Описание</string>
+</resources>
