@@ -35,10 +35,6 @@ public class EventsActivity extends AppCompatActivity {
     private static final int LOADER_ID = 1;
     private static final String TAG = "EventsActivity";
 
-
-
-    private TextView displayNameTextView;
-    private EventsAdapter eventsAdapter;
     private ListView listView;
 
     @Override

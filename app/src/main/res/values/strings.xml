@@ -5,7 +5,6 @@
     <string name="place">Место</string>
     <string name="date_format">%1$d.%2$d.%3$d.</string>
     <string name="select_id_format">%1$s = %2$s</string>
-    <string name="add_event_but">Добавить событие</string>
     <string name="delete_event_but">Удалить событие</string>
     <string name="update_event">Обновить событие</string>
     <string name="begin_date">Начало события</string>

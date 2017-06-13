@@ -21,7 +21,7 @@ import android.widget.CalendarView;
 import java.util.Calendar;
 
 public class CalendarActivity extends AppCompatActivity {
-    public static  long calID ;
+    public static  long calID = 1;
     private static final String TAG = "CalendarActivity";
     private static final int PERMISSION_REQUEST_CODE = 1;
 
@@ -40,7 +40,7 @@ public class CalendarActivity extends AppCompatActivity {
         checkPermission();
         //createCalendarWithId();
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendar_view);
-        calID = calendarView.getId();
+
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
