@@ -16,7 +16,7 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Календарь событий: "/>
+            android:text="@string/calendar"/>
 
     <ListView
             android:id="@+id/event_list"
