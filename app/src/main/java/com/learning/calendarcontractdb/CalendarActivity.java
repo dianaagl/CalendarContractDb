@@ -38,7 +38,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 
         checkPermission();
-        //createCalendarWithId();
+        createCalendarWithId();
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendar_view);
 
         final Calendar c = Calendar.getInstance();
@@ -66,6 +66,7 @@ public class CalendarActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.calendar_menu, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
