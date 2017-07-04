@@ -14,4 +14,10 @@
     <string name="calendar">Календарь событий:</string>
     <string name="calendar_name">Calendar</string>
     <string name="owner_account">Owner</string>
+    <string name="once">Одноразовое событие</string>
+    <string name="every_day">Каждый день</string>
+    <string name="every_month">Каждый месяц</string>
+    <string name="every_year">Каждый год</string>
+    <string name="every_weak">Каждую неделю</string>
+    <string name="end_event_more">Окончание события должно быть позже начала</string>
 </resources>

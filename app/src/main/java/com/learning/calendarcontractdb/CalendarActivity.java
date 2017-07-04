@@ -1,6 +1,9 @@
 package com.learning.calendarcontractdb;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -10,6 +13,7 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +36,8 @@ public class CalendarActivity extends AppCompatActivity {
 
     private static final int LOADER_ID = 1;
     private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final int PENDING_INTENT_REQUEST_CODE = 1;
+    private static final int NOTIFICATION_ID = 1;
     private ListView dayEventsList;
     public static long calendarId = 1;
     private Calendar selectedDate;
@@ -55,6 +61,7 @@ public class CalendarActivity extends AppCompatActivity {
                 intent.putExtra(Event.EventContract.DTEND,event.getDtend());
                 intent.putExtra(Event.EventContract.ID,event.getId());
                 intent.putExtra(Event.EventContract.DESCRIPTION,event.getDescription());
+                intent.putExtra(Event.EventContract.RRULE,event.getRrule());
                 startActivity(intent);
             }
         });
@@ -64,6 +71,7 @@ public class CalendarActivity extends AppCompatActivity {
         selectedDate = Calendar.getInstance();
         selectedDate.set(Calendar.HOUR_OF_DAY,0);
         selectedDate.set(Calendar.MINUTE,0);
+
         findViewById(R.id.add_event_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,11 +95,37 @@ public class CalendarActivity extends AppCompatActivity {
                 getSupportLoaderManager().restartLoader(LOADER_ID, null,new  EventsLoaderCallbacks());
             }
         });
-
+        sendNotification();
         getSupportLoaderManager().initLoader(LOADER_ID, null,new  EventsLoaderCallbacks());
 
     }
+    public void sendNotification(){
 
+        Intent intent = new Intent(this, AddEventActivity.class);
+        intent.putExtra(AddEventActivity.DAY,selectedDate.get(Calendar.DAY_OF_MONTH));
+        intent.putExtra(AddEventActivity.MONTH,selectedDate.get(Calendar.MONTH));
+        intent.putExtra(AddEventActivity.YEAR,selectedDate.get(Calendar.YEAR));
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                PENDING_INTENT_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        NotificationCompat.Builder  builder =  new NotificationCompat.Builder(this);
+
+        builder.setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.ic_access_alarms_black_24dp)
+                .setTicker("Notification")
+                .setContentTitle("Title")
+                .setContentText("ContentText");
+        Notification notification = builder.build();
+        NotificationManager notificationManager = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(NOTIFICATION_ID,notification);
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.calendar_menu, menu);
@@ -103,16 +137,11 @@ public class CalendarActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean handled = false;
         switch (item.getItemId()) {
-
-
-
-
             case R.id.show_all_events:{
                 Intent intent = new Intent(CalendarActivity.this,EventsActivity.class);
                 startActivity(intent);
 
             }
-
             default: {
                 handled = super.onOptionsItemSelected(item);
                 break;

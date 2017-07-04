@@ -1,10 +1,26 @@
 package com.learning.calendarcontractdb;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.RecursiveTask;
+
 /**
  * Created by Диана on 12.06.2017.
  */
 public class Event {
+
     public static class EventContract{
+        public static final int EVERY_DAY = 0;
+        public static final int EVERY_WEEK = 1;
+        public static final int EVERY_MONTH = 2;
+        public static final int EVERY_YEAR = 3;
+
+
         public static final String ID = "ID";
         public static final String TITLE = "TITLE";
         public static final String DTSTART = "DTSTART";
@@ -15,6 +31,18 @@ public class Event {
         public static final String EVENT_PLACE = "EVENT_PLACE";
         public static final String CALENDAR_ID = "CALENDAR_ID";
         public static final String DESCRIPTION = "DESCRIPTION";
+        public static ArrayList<String> rruleList = new ArrayList<>();
+        static  {
+            rruleList.add("FREQ=WEEKLY;UNTIL=19971007T000000Z;WKST=SU;BYDAY=TU,TH");
+            rruleList.add("FREQ=WEEKLY;INTERVAL=1");
+            rruleList.add("FREQ=MONTHLY;INTERVAL=1");
+            rruleList.add("FREQ=YEARLY;INTERVAL=1");
+
+        }
+        public static String getRrule(int rrule){
+
+            return rruleList.get(rrule);
+        }
     }
     private Long id;
     private String title;

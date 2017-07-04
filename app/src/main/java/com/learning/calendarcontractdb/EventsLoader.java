@@ -52,7 +52,7 @@ public class EventsLoader extends AsyncTaskLoader<List<Event> > {
                         list.add(event);
                     }
                     cursor.moveToNext();
-                    Log.e(TAG, "time " + beginTime + " - " + endTime+ " = " + event.getDtstart());
+
                 }
             }
             cursor.close();

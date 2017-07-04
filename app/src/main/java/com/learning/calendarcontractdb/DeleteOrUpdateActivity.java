@@ -28,6 +28,7 @@ public class DeleteOrUpdateActivity extends AppCompatActivity{
     private EditText titleEditText;
     private EditText placeEditText;
     private EditText descriptionEditText;
+    private Spinner rruleSpinner;
     private Calendar calendar;
 
     @Override
@@ -41,8 +42,11 @@ public class DeleteOrUpdateActivity extends AppCompatActivity{
         titleEditText = (EditText) findViewById(R.id.title_update_event);
         placeEditText = (EditText) findViewById(R.id.location_update_event);
         descriptionEditText = (EditText) findViewById(R.id.description_update_event);
+        rruleSpinner = (Spinner) findViewById(R.id.rrule_spinner);
 
         Intent intent = getIntent();
+
+        rruleSpinner.setSelection(Event.EventContract.rruleList.indexOf(intent.getStringExtra(RRULE)));
 
         titleEditText.setText(intent.getStringExtra(Event.EventContract.TITLE));
         placeEditText.setText(intent.getStringExtra(EVENT_PLACE));

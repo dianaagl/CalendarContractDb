@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="rrule_string_array">
+        <item>@string/every_day</item>
+        <item>@string/every_weak</item>
+        <item>@string/every_year</item>
+        <item>@string/every_month</item>
+    </string-array>
+</resources>

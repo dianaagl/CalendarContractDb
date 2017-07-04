@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.*;
 
+import java.lang.reflect.Array;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -17,10 +20,11 @@ import java.util.TimeZone;
 /**
  * Created by Диана on 12.06.2017.
  */
-public class AddEventActivity extends AppCompatActivity{
+public class AddEventActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     public static final String MONTH = "month";
     public static final String YEAR = "year";
     public static final String DAY = "day";
+    public static final int SELECTED_POSITION = 0;
 
     private GregorianCalendar startDateCalendar;
     private GregorianCalendar endDateCalendar;
@@ -32,6 +36,7 @@ public class AddEventActivity extends AppCompatActivity{
     private EditText placeEditText;
     private EditText titleEditText;
     private EditText descriptionEditText;
+    private Spinner rruleSpinner;
 
 
     @Override
@@ -47,10 +52,16 @@ public class AddEventActivity extends AppCompatActivity{
         descriptionEditText = (EditText) findViewById(R.id.description_update_event);
         endDatePicker = (DatePicker) findViewById(R.id.date_end_pick);
         endTimePicker = (TimePicker) findViewById(R.id.time_end);
+        rruleSpinner = (Spinner) findViewById(R.id.rrule_spinner);
+
         startDateCalendar = new GregorianCalendar();
         endDateCalendar = new GregorianCalendar();
 
-
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.rrule_string_array));
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rruleSpinner.setAdapter(arrayAdapter);
+        rruleSpinner.setOnItemSelectedListener(this);
 
         Intent intent = getIntent();
         startDateCalendar.set(Calendar.YEAR,intent.getIntExtra(YEAR, 2017));
@@ -142,15 +153,19 @@ public class AddEventActivity extends AppCompatActivity{
                     place = "";
                     description = "";
                 };
-
-                createEventForCalendarWithId(String.valueOf(CalendarActivity.calendarId),
-                        startDateCalendar.getTimeInMillis(),
-                        endDateCalendar.getTimeInMillis(),
-                        description,
-                        title,
-                        place);
-
-                finish();
+                if(startDateCalendar.getTimeInMillis() < endDateCalendar.getTimeInMillis()) {
+                    createEventForCalendarWithId(String.valueOf(CalendarActivity.calendarId),
+                            startDateCalendar.getTimeInMillis(),
+                            endDateCalendar.getTimeInMillis(),
+                            description,
+                            title,
+                            place);
+                    finish();
+                }
+                else {
+                    Toast toast = new Toast(AddEventActivity.this);
+                    toast.makeText(AddEventActivity.this,R.string.end_event_more,4000);
+                }
                 break;
         }
 
@@ -166,14 +181,21 @@ public class AddEventActivity extends AppCompatActivity{
         cv.put(CalendarContract.Events.DTEND, endTime);
         cv.put(CalendarContract.Events.TITLE, title);
         cv.put(CalendarContract.Events.EVENT_LOCATION,location);
+        cv.put(CalendarContract.Events.RRULE, Event.EventContract.getRrule(rruleSpinner.getSelectedItemPosition()));
         cv.put(CalendarContract.Events.DESCRIPTION, description);
         cv.put(CalendarContract.Events.CALENDAR_ID, calendarId);
         cv.put(CalendarContract.Events.EVENT_TIMEZONE, String.valueOf(TimeZone.getDefault()));
 
-
         AddEventActivity.this.getContentResolver().insert(CalendarContract.Events.CONTENT_URI, cv);
+    }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        rruleSpinner.setSelection(SELECTED_POSITION);
     }
 }
