@@ -12,52 +12,83 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CalendarView;
+import android.widget.ListView;
 
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 public class CalendarActivity extends AppCompatActivity {
-    public static  long calID = 1;
+
     private static final String TAG = "CalendarActivity";
+
+    private static final int LOADER_ID = 1;
     private static final int PERMISSION_REQUEST_CODE = 1;
-
-    private int year;
-    private int month;
-    private int day;
-
+    private ListView dayEventsList;
+    public static long calendarId = 1;
+    private Calendar selectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_layout);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
-
+        CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
+        dayEventsList  = (ListView) findViewById(R.id.day_events);
+        dayEventsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(CalendarActivity.this,DeleteOrUpdateActivity.class);
+                Event event = (Event) dayEventsList.getItemAtPosition(position);
+                intent.putExtra(Event.EventContract.TITLE,event.getTitle());
+                intent.putExtra(Event.EventContract.EVENT_PLACE,event.getEventPlace());
+                intent.putExtra(Event.EventContract.DTSTART,event.getDtstart());
+                intent.putExtra(Event.EventContract.DTEND,event.getDtend());
+                intent.putExtra(Event.EventContract.ID,event.getId());
+                intent.putExtra(Event.EventContract.DESCRIPTION,event.getDescription());
+                startActivity(intent);
+            }
+        });
 
         checkPermission();
         createCalendarWithId();
-        CalendarView calendarView = (CalendarView) findViewById(R.id.calendar_view);
+        selectedDate = Calendar.getInstance();
+        selectedDate.set(Calendar.HOUR_OF_DAY,0);
+        selectedDate.set(Calendar.MINUTE,0);
+        findViewById(R.id.add_event_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CalendarActivity.this,AddEventActivity.class);
 
-        final Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH);
-        day = c.get(Calendar.DAY_OF_MONTH);
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+                intent.putExtra(AddEventActivity.DAY,selectedDate.get(Calendar.DAY_OF_MONTH));
+                intent.putExtra(AddEventActivity.MONTH,selectedDate.get(Calendar.MONTH));
+                intent.putExtra(AddEventActivity.YEAR,selectedDate.get(Calendar.YEAR));
+
+                startActivity(intent);
+            }
+        });
+       calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
             @Override
             public void onSelectedDayChange(CalendarView view, int year,
                                             int month, int dayOfMonth) {
-
-                CalendarActivity.this.year = year;
-                CalendarActivity.this.month = month;
-                CalendarActivity.this.day = dayOfMonth;
-
-
+                selectedDate.set(Calendar.YEAR,year);
+                selectedDate.set(Calendar.MONTH,month);
+                selectedDate.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                getSupportLoaderManager().restartLoader(LOADER_ID, null,new  EventsLoaderCallbacks());
             }
         });
+
+        getSupportLoaderManager().initLoader(LOADER_ID, null,new  EventsLoaderCallbacks());
 
     }
 
@@ -72,20 +103,12 @@ public class CalendarActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean handled = false;
         switch (item.getItemId()) {
-            case R.id.add_event_menu_item: {
 
-                Intent intent = new Intent(CalendarActivity.this,AddEventActivity.class);
 
-                intent.putExtra(AddEventActivity.DAY,day);
-                intent.putExtra(AddEventActivity.MONTH,month);
-                intent.putExtra(AddEventActivity.YEAR,year);
-                Log.e(TAG,"day="+ day+" " +month+" "+ year);
-                startActivity(intent);
-                break;
-            }
+
+
             case R.id.show_all_events:{
                 Intent intent = new Intent(CalendarActivity.this,EventsActivity.class);
-
                 startActivity(intent);
 
             }
@@ -145,21 +168,47 @@ public class CalendarActivity extends AppCompatActivity {
         return uri.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER,"true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, CalendarActivity.this.getString(R.string.app_name))
-                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL).build();
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE,
+                        CalendarContract.ACCOUNT_TYPE_LOCAL).build();
     }
     public void createCalendarWithId() {
         Uri createUri = asSyncAdapter(CalendarContract.Calendars.CONTENT_URI);
         ContentValues cv = new ContentValues();
-        cv.put(CalendarContract.Calendars.NAME, "Calendar " );
+        cv.put(CalendarContract.Calendars.NAME, getString(R.string.calendar_name) );
         cv.put(CalendarContract.Calendars.CALENDAR_COLOR, "");
         cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
-        cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, "Owner");
+        cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, getString(R.string.owner_account));
         cv.put(CalendarContract.Calendars.ACCOUNT_NAME, CalendarActivity.this.getString(R.string.app_name));
         cv.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
         Uri insertedCalendar = CalendarActivity.this.getContentResolver().insert(createUri, cv);
-        //Uri insertedEvent = EventsActivity.this.getContentResolver().insert(CalendarContract.Events.CONTENT_URI, cv);
-        calID = ContentUris.parseId(insertedCalendar);
-        Log.e(TAG,"cal_id="+ calID);
-    }
+        calendarId = ContentUris.parseId(insertedCalendar);
 
+    }
+    private class EventsLoaderCallbacks implements android.support.v4.app.LoaderManager.LoaderCallbacks<List<Event>> {
+        @Override
+        public android.support.v4.content.Loader<List<Event>> onCreateLoader(int id, Bundle args)
+        {
+            GregorianCalendar calendar = new GregorianCalendar(
+                    selectedDate.get(Calendar.YEAR),
+                    selectedDate.get(Calendar.MONTH),
+                    selectedDate.get(Calendar.DAY_OF_MONTH));
+
+            calendar.add(calendar.DAY_OF_MONTH,1);
+
+            return new EventsLoader(CalendarActivity.this,selectedDate.getTimeInMillis(),
+                                                                    calendar.getTimeInMillis());
+        }
+
+        @Override
+        public void onLoadFinished(android.support.v4.content.Loader<List<Event>> loader, List<Event> data) {
+
+            EventsAdapter adapter = new EventsAdapter(data);
+            dayEventsList.setAdapter(adapter);
+
+        }
+
+        @Override
+        public void onLoaderReset(android.support.v4.content.Loader<List<Event>> loader) {
+        }
+    }
 }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -19,9 +20,8 @@ import java.util.List;
  */
 public class EventsAdapter extends BaseAdapter {
     private static final String TAG = "Adapter";
+    public static final String DATE_FORMAT = "dd/MM/yyyy hh:mm";
     List<Event> eventList = new ArrayList<>();
-
-
 
     public EventsAdapter(List<Event> eventList) {
         this.eventList = new ArrayList<>(eventList);
@@ -39,7 +39,7 @@ public class EventsAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return eventList.get(position).hashCode();
+        return eventList.get(position).getId();
     }
 
     @Override
@@ -53,42 +53,26 @@ public class EventsAdapter extends BaseAdapter {
 
         EventHolder holder = (EventHolder) view.getTag();
         Event event = eventList.get(position);
-        Log.e(TAG,"event ="+ event);
-        Log.e(TAG,"time="+event.getDtstart() ); //event.getDtstart());
-        //holder.eventTimezoneTextView.setText(event.getEventPlace());
         holder.dtstartTextView.setText(getDate(event.getDtstart()));
         holder.dtendTextView.setText(getDate(event.getDtend()));
         holder.titleTextView.setText(event.getTitle());
-        holder.eventPlaceTextView.setText(event.getEventPlace());
         holder.descriptionTextView.setText(event.getDescription());
-        //Log.e(TAG,"event=" + event);
         return view;
     }
     public static String getDate(Long milliSeconds)
     {
-        String dateFormat = "dd/MM/yyyy hh:mm";
-
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
-
+        return new SimpleDateFormat(DATE_FORMAT).format(new Date(milliSeconds));
     }
     private static class EventHolder{
         private TextView dtstartTextView;
         private TextView dtendTextView;
         private TextView titleTextView;
-        private TextView eventPlaceTextView;
         private TextView descriptionTextView;
 
         public EventHolder(View view) {
             dtstartTextView = (TextView) view.findViewById(R.id.start_event);
             dtendTextView = (TextView) view.findViewById(R.id.end_event);
-            eventPlaceTextView = (TextView) view.findViewById(R.id.place_event);
             descriptionTextView = (TextView) view.findViewById(R.id.description_event);
-
             titleTextView = (TextView) view.findViewById(R.id.title_event);
         }
 

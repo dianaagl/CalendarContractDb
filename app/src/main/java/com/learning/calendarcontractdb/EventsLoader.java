@@ -21,14 +21,16 @@ import java.util.List;
 public class EventsLoader extends AsyncTaskLoader<List<Event> > {
 
     private EventsContentObserver eventsContentObserver;
-    protected static Context context;
+
 
     private static final String TAG = "Loader";
+    private long beginTime,endTime;
 
-    public EventsLoader(Context context) {
+    public EventsLoader(Context context, long beginTime, long endTime) {
 
         super(context);
-        this.context = context;
+        this.beginTime = beginTime;
+        this.endTime = endTime;
         Log.e(TAG,"eventsLoader");
         eventsContentObserver = new EventsContentObserver();
         context.getContentResolver().registerContentObserver(
@@ -45,9 +47,12 @@ public class EventsLoader extends AsyncTaskLoader<List<Event> > {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 while (!cursor.isAfterLast()) {
-                    list.add(createEventFromCursor(cursor));
-
+                    Event event = createEventFromCursor(cursor);
+                    if(event.getDtstart() > beginTime && event.getDtstart() < endTime) {
+                        list.add(event);
+                    }
                     cursor.moveToNext();
+                    Log.e(TAG, "time " + beginTime + " - " + endTime+ " = " + event.getDtstart());
                 }
             }
             cursor.close();
@@ -88,13 +93,10 @@ public class EventsLoader extends AsyncTaskLoader<List<Event> > {
         return event;
     }
     private Cursor getEventsCursor() {
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = null;
-
-            cursor = resolver.query(
+        ContentResolver resolver = getContext().getContentResolver();
+        Cursor cursor = resolver.query(
                     CalendarContract.Events.CONTENT_URI,
                     null, null, null, null);
-
 
         return cursor;
     }

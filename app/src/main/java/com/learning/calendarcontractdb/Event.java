@@ -4,6 +4,18 @@ package com.learning.calendarcontractdb;
  * Created by Диана on 12.06.2017.
  */
 public class Event {
+    public static class EventContract{
+        public static final String ID = "ID";
+        public static final String TITLE = "TITLE";
+        public static final String DTSTART = "DTSTART";
+        public static final String DTEND = "DTEND";
+        public static final String DURATION = "DURATION";
+        public static final String RRULE = "RRULE";
+        public static final String RDATE = "RDATE";
+        public static final String EVENT_PLACE = "EVENT_PLACE";
+        public static final String CALENDAR_ID = "CALENDAR_ID";
+        public static final String DESCRIPTION = "DESCRIPTION";
+    }
     private Long id;
     private String title;
     private Long dtstart;

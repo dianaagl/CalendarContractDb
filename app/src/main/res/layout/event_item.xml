@@ -1,31 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-android:padding="@dimen/standart_padding">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:paddingRight="@dimen/padding_right" android:text="@string/begin_date" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/start_event" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:paddingRight="@dimen/padding_right" android:text="@string/end_evnt" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+              android:layout_height="wrap_content"
+              android:padding="@dimen/standart_padding">
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                tools:text="11/04/15 17:30"
+                android:textAppearance="@style/TextAppearanceGrey"
+               android:id="@+id/start_event"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"/>
+        <TextView
 
-        <TextView android:id="@+id/end_event" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                android:textAppearance="@style/TextAppearanceGrey"
+                android:text="-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                tools:text="11/04/15 17:30"
+                android:textAppearance="@style/TextAppearanceGrey"
+                android:id="@+id/end_event"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:paddingRight="@dimen/padding_right" android:text="@string/place" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/title_event"
+              android:textAppearance="@style/TextAppearance.AppCompat.Title"
+              tools:text="Встреча название"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/description_event"
+              tools:text="Описание встречи"
+              android:textAppearance="@style/TextAppearanceGrey"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
 
-        <TextView android:id="@+id/place_event" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:paddingRight="@dimen/padding_right" android:text="@string/title" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-       <TextView android:id="@+id/title_event" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:paddingRight="@dimen/padding_right" android:text="@string/description" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-        <TextView android:id="@+id/description_event" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    </LinearLayout>
 </LinearLayout>

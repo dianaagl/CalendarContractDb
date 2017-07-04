@@ -12,4 +12,6 @@
     <string name="end_evnt">Конец события</string>
     <string name="description">Описание</string>
     <string name="calendar">Календарь событий:</string>
+    <string name="calendar_name">Calendar</string>
+    <string name="owner_account">Owner</string>
 </resources>

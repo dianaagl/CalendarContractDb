@@ -6,14 +6,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.*;
 
 import java.util.Calendar;
 import java.util.TimeZone;
+
+import static com.learning.calendarcontractdb.Event.EventContract.*;
 
 /**
  * Created by Диана on 13.06.2017.
@@ -25,114 +28,112 @@ public class DeleteOrUpdateActivity extends AppCompatActivity{
     private EditText titleEditText;
     private EditText placeEditText;
     private EditText descriptionEditText;
-    private Button deleteButton;
-    private Button updateButton;
+    private Calendar calendar;
 
-
-    private int year;
-    private int month;
-    private int day;
-
-    private int hour;
-    private int minut;
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.del_or_up_activity);
-        datePicker = (DatePicker) findViewById(R.id.date_update);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
+        datePicker = (DatePicker) findViewById(R.id.date_start_pick);
         timePicker = (TimePicker) findViewById(R.id.time_update);
         titleEditText = (EditText) findViewById(R.id.title_update_event);
         placeEditText = (EditText) findViewById(R.id.location_update_event);
         descriptionEditText = (EditText) findViewById(R.id.description_update_event);
 
-        deleteButton  = (Button) findViewById(R.id.delete_event);
-        updateButton = (Button) findViewById(R.id.update_button);
-
-
         Intent intent = getIntent();
 
-        titleEditText.setText(intent.getStringExtra(EventsActivity.TITLE));
-        placeEditText.setText(intent.getStringExtra(EventsActivity.LOCATION));
-        descriptionEditText.setText(intent.getStringExtra(EventsActivity.DESCRIPTION));
+        titleEditText.setText(intent.getStringExtra(Event.EventContract.TITLE));
+        placeEditText.setText(intent.getStringExtra(EVENT_PLACE));
+        descriptionEditText.setText(intent.getStringExtra(DESCRIPTION));
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(intent.getLongExtra(EventsActivity.START_DATE,0));
+        calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(intent.getLongExtra(DTSTART, 0));
 
-        year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
-        day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        timePicker.setHour(calendar.getTime().getHours());
-        timePicker.setMinute(calendar.getTime().getMinutes());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            timePicker.setHour(calendar.get(Calendar.HOUR));
+            timePicker.setMinute(calendar.get(Calendar.MINUTE));
+        } else {
+            timePicker.setCurrentHour(calendar.get(Calendar.HOUR));
+            timePicker.setCurrentMinute(calendar.get(Calendar.MINUTE));
+        }
 
-        hour = timePicker.getHour();
-        minut = timePicker.getMinute();
 
-        datePicker.init(year,month,
-                day, new DatePicker.OnDateChangedListener() {
-
+        datePicker.init(calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH),
+                new DatePicker.OnDateChangedListener() {
                     @Override
                     public void onDateChanged(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
-                DeleteOrUpdateActivity.this.year = year;
-                DeleteOrUpdateActivity.this.month = month;
-                DeleteOrUpdateActivity.this.day = dayOfMonth;
-
-
-            }
-        });
+                        calendar.set(Calendar.YEAR, year);
+                        calendar.set(Calendar.MONTH, monthOfYear);
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    }
+                });
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                DeleteOrUpdateActivity.this.hour = hourOfDay;
-                DeleteOrUpdateActivity.this.minut = minute;
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                calendar.set(Calendar.MINUTE, minute);
             }
         });
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e(TAG,"");
-                DeleteOrUpdateActivity.this.getContentResolver().delete(
-                        CalendarContract.Events.CONTENT_URI,
-                        String.format(getResources().getString(R.string.select_id_format),
-                                CalendarContract.Events._ID,
-                                String.valueOf(getIntent().getLongExtra(EventsActivity.ID_EVENT,0))),
-                        null);
-                Log.e(TAG, "id="+getIntent().getLongExtra(EventsActivity.ID_EVENT,0));
-                finish();
-            }
-        });
-        updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e(TAG,"update");
+    }
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.del_or_update_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.update_event:
                 ContentValues cv = new ContentValues();
-                Long startMil = AddEventActivity.createMillisFromDate(year,month,day,hour,minut);
+                Long startMil = calendar.getTimeInMillis();
                 cv.put(CalendarContract.Events.DTSTART, startMil);
                 cv.put(CalendarContract.Events.DTEND,startMil);
                 cv.put(CalendarContract.Events.TITLE, String.valueOf(titleEditText.getText()));
                 cv.put(CalendarContract.Events.EVENT_LOCATION, String.valueOf(placeEditText.getText()));
                 cv.put(CalendarContract.Events.DESCRIPTION,String.valueOf(descriptionEditText.getText()));
-                cv.put(CalendarContract.Events.CALENDAR_ID, CalendarActivity.calID);
+                cv.put(CalendarContract.Events.CALENDAR_ID, CalendarActivity.calendarId);
                 cv.put(CalendarContract.Events.EVENT_TIMEZONE, String.valueOf(TimeZone.getDefault()));
 
-                DeleteOrUpdateActivity.this.getContentResolver().update(CalendarContract.Events.CONTENT_URI,cv,
+                getApplicationContext().getContentResolver().update(
+                        CalendarContract.Events.CONTENT_URI,
+                        cv,
                         String.format(getResources().getString(R.string.select_id_format),
-                                CalendarContract.Events._ID, String.valueOf(getIntent().getLongExtra(EventsActivity.ID_EVENT,0))) ,
+                                CalendarContract.Events._ID,
+                                String.valueOf(getIntent().getLongExtra(ID,0))) ,
 
                         null);
-                Log.e(TAG,String.format(getResources().getString(R.string.select_id_format),
-                        CalendarContract.Events._ID, String.valueOf(getIntent().getLongExtra(EventsActivity.ID_EVENT,0))));
                 finish();
-            }
-        });
-
-
-
-
-
-
-
+                break;
+            case R.id.delete_event:
+                DeleteOrUpdateActivity.this.getContentResolver().delete(
+                        CalendarContract.Events.CONTENT_URI,
+                        String.format(getResources().getString(R.string.select_id_format),
+                                CalendarContract.Events._ID,
+                                String.valueOf(getIntent().getLongExtra(ID,0))),
+                        null);
+                Log.e(TAG, "id="+getIntent().getLongExtra(ID,0));
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
+
+
+
+
+
+
+
 }

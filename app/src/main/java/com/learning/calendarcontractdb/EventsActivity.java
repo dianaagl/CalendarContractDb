@@ -16,20 +16,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import static android.Manifest.permission_group.LOCATION;
+import static com.learning.calendarcontractdb.Event.EventContract.*;
 
 /**
  * Created by Диана on 12.06.2017.
  */
 public class EventsActivity extends AppCompatActivity {
-
-    public static final String TITLE = "title";
-    public static final String LOCATION = "location";
-    public static final String START_DATE = "start";
-    public static final String ID_EVENT = "id";
-    public static final String DESCRIPTION = "description";
-
-    public static final String END_TIME = "end";
 
 
     private static final int LOADER_ID = 1;
@@ -50,10 +46,10 @@ public class EventsActivity extends AppCompatActivity {
                 Intent intent = new Intent(EventsActivity.this,DeleteOrUpdateActivity.class);
                 Event event = (Event) listView.getItemAtPosition(position);
                 intent.putExtra(TITLE,event.getTitle());
-                intent.putExtra(LOCATION,event.getEventPlace());
-                intent.putExtra(START_DATE,event.getDtstart());
-                intent.putExtra(END_TIME,event.getDtend());
-                intent.putExtra(ID_EVENT,event.getId());
+                intent.putExtra(EVENT_PLACE,event.getEventPlace());
+                intent.putExtra(DTSTART,event.getDtstart());
+                intent.putExtra(DTEND,event.getDtend());
+                intent.putExtra(ID,event.getId());
                 intent.putExtra(DESCRIPTION,event.getDescription());
                 startActivity(intent);
             }
@@ -70,7 +66,11 @@ public class EventsActivity extends AppCompatActivity {
         @Override
         public Loader<List<Event>> onCreateLoader(int id, Bundle args)
         {
-            return new EventsLoader(EventsActivity.this);
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.add(Calendar.YEAR,2);
+
+            return new EventsLoader(EventsActivity.this,0,calendar.getTimeInMillis());
         }
 
         @Override
